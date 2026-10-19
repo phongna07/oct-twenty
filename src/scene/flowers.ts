@@ -38,8 +38,8 @@ export function createFlower(index: number): Flower {
   }
   if (tulip || lily) {
     head.rotation.x = tulip ? 0.18 : 0.95
-    material.roughness = tulip ? 0.67 : 0.76
-    material.metalness = 0; material.clearcoat = 0.02; material.sheen = 0.55
+    material.roughness = tulip ? 0.55 : 0.76
+    material.metalness = 0; material.clearcoat = 0.02; material.sheen = tulip ? 0.35 : 0.55
     head.add((tulip ?? lily)!.group)
   }
   const petals: { mesh: THREE.InstancedMesh; layerIndex: number; count: number; radius: number; open: number }[] = []

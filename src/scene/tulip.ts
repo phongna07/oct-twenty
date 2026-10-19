@@ -13,7 +13,12 @@ function tulipTepal(inner: boolean, opening: number): THREE.BufferGeometry {
       const closedRadius = 0.025 + 0.275 * Math.pow(Math.sin(v * Math.PI), 0.72) + 0.018 * v
       const openRadius = 0.025 + 0.53 * Math.sqrt(1 - Math.pow(1 - v, 2))
         - 0.11 * THREE.MathUtils.smoothstep(v, 0.55, 1)
-      const radius = THREE.MathUtils.lerp(closedRadius, openRadius, opening) * (inner ? 0.94 : 1)
+      // Give each shell its own convex face and turned-in sides. Concentric
+      // surfaces otherwise share almost identical normals and read as one bulb.
+      const shoulder = Math.pow(Math.abs(u), 3) * Math.sin(v * Math.PI / 2)
+      const radius = THREE.MathUtils.lerp(closedRadius, openRadius, opening)
+        * (inner ? 0.94 : 1) * (1 - shoulder * 0.11)
+        + 0.014 * THREE.MathUtils.smoothstep(v, 0.85, 1) * (1 - u * u) * opening
       const height = inner ? 1.17 : 1.10
       const y = v * (height + (1 - opening) * 0.06) - 0.14 * u * u * Math.pow(v, 4)
         + 0.008 * Math.sin(u * 4 + v * 5) * v * v * opening

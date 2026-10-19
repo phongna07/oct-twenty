@@ -23,8 +23,8 @@ export function petalMaterial(color: string, accent: string, profile: 'default' 
     shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', `
       #include <color_fragment>
       float vein = pow(abs(sin((vPetalUv.x - 0.5) * 51.0 + sin(vPetalUv.y * 7.0) * 1.4)), 18.0);
-      float rim = smoothstep(0.55, 1.0, vPetalUv.y);
-      diffuseColor.rgb = mix(diffuseColor.rgb * (0.78 + 0.22 * vPetalUv.y), uTipColor, rim * 0.72);
+      float rim = smoothstep(${profile === 'tulip' ? '0.72' : '0.55'}, 1.0, vPetalUv.y);
+      diffuseColor.rgb = mix(diffuseColor.rgb * (0.78 + 0.22 * vPetalUv.y), uTipColor, rim * ${profile === 'tulip' ? '0.5' : '0.72'});
       diffuseColor.rgb *= 1.0 - vein * 0.035 * sin(vPetalUv.y * 3.14159);
       ${profile === 'lily' ? `
       float stripe = exp(-pow((vPetalUv.x - 0.5) * 9.0, 2.0));
@@ -42,13 +42,26 @@ export function petalMaterial(color: string, accent: string, profile: 'default' 
       diffuseColor.rgb *= 1.0 - stripe * 0.075 * sin(vPetalUv.y * 3.14159);
       ` : ''}
     `)
+    if (profile === 'tulip') {
+      // Local occlusion keeps overlapping sides readable even in the generous
+      // ambient fill. It follows the petal UVs through both opening and rotation.
+      shader.fragmentShader = shader.fragmentShader.replace('#include <aomap_fragment>', `
+        #include <aomap_fragment>
+        float sideOcclusion = smoothstep(0.52, 1.0, abs(vPetalUv.x * 2.0 - 1.0))
+          * smoothstep(0.03, 0.3, vPetalUv.y) * (1.0 - smoothstep(0.88, 1.0, vPetalUv.y));
+        float rootOcclusion = 1.0 - smoothstep(0.0, 0.24, vPetalUv.y);
+        reflectedLight.indirectDiffuse *= 1.0 - sideOcclusion * 0.52 - rootOcclusion * 0.18;
+        reflectedLight.directDiffuse *= 1.0 - sideOcclusion * 0.16;
+        reflectedLight.indirectSpecular *= 1.0 - sideOcclusion * 0.4;
+      `)
+    }
     shader.fragmentShader = shader.fragmentShader.replace('#include <opaque_fragment>', `
       float backlight = pow(1.0 - abs(dot(normal, normalize(vViewPosition))), 2.0);
-      outgoingLight += diffuseColor.rgb * backlight * 0.13;
+      outgoingLight += diffuseColor.rgb * backlight * ${profile === 'tulip' ? '0.04' : '0.13'};
       #include <opaque_fragment>
     `)
   }
-  material.customProgramCacheKey = () => `pink-bloom-petal-v2-${profile}`
+  material.customProgramCacheKey = () => `pink-bloom-petal-v3-${profile}`
   return { material, uniforms }
 }
 
