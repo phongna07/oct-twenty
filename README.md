@@ -33,12 +33,16 @@ The 30-second sequence runs automatically after assets are ready: 3–2–1 coun
 - `src/scene/flowers.ts` and `geometry.ts`: procedural flower shapes and petal arrangements.
 - `src/scene/rose.ts`: rolled rose center, cupped petals, curled edges and opening animation.
 - `src/scene/peony.ts`: double peony with broad guard petals, a dense ruffled crown and staged opening.
+- `src/scene/tulip.ts`: six overlapping, rounded tepals in two alternating whorls, with a bud-to-cup morph.
+- `src/scene/lily.ts`: six pointed, recurved tepals, six curved stamens and a three-lobed stigma.
 - `src/scene/materials.ts`: GLSL petal deformation, veins, gradients and backlighting.
 - `src/scene/bouquet.ts`: paper, ribbon, foliage and gift geometry.
 - `src/scene/experience.ts`: GSAP choreography, camera, lighting and rendering quality.
 - `src/style.css`: pink atmosphere, responsive captions and controls.
 
 The double peony's broad guard petals and densely petalled center follow the botanical forms described by [Matthaei Botanical Gardens & Nichols Arboretum](https://mbgna.umich.edu/floral-forms). Its geometry is generated locally, including the bud-to-bloom morphs.
+
+The tulip's upright cup and broad leaves follow the [RHS tulip guide](https://www.rhs.org.uk/plants/tulip/growing-guide). The lily's flared, recurved tepals follow [Missouri Botanical Garden's Lilium description](https://www.missouribotanicalgarden.org/PlantFinder/PlantFinderDetails.aspx?taxonid=258357); its six tepals, six stamens and single pistil also follow the lily modeling example in [Ijiri et al., Floral diagrams and inflorescences](https://www-ui.is.s.u-tokyo.ac.jp/~takeo/papers/ijiri_siggraph2005_flower.pdf). Both models and their opening morphs are generated locally; no downloaded meshes or textures are required.
 
 Greeting text uses a subset of **Cormorant Garamond** from Google Fonts, under the SIL Open Font License in `public/fonts/OFL.txt`. After editing the scene's text, update the character set in `scripts/prepare-font.mjs`, then run:
 
