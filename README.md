@@ -23,7 +23,7 @@ npm run preview
 
 ## Experience
 
-The 30-second sequence runs automatically after assets are ready: 3–2–1 countdown, five individual flower reveals and transfers, bouquet wrapping and gifts, then the dimensional greeting. “Xem lại” replays it. Motion pauses when the browser tab is hidden. Reduced-motion visitors receive a gentle final reveal; browsers without WebGL receive a readable greeting.
+The 30-second sequence runs automatically after assets are ready: 3–2–1 countdown, five individual flower reveals and transfers, bouquet wrapping and gifts, then the dimensional greeting. Motion pauses when the browser tab is hidden. Reduced-motion visitors receive a gentle final reveal; browsers without WebGL receive a readable greeting.
 
 ## Customize
 
@@ -43,4 +43,4 @@ Greeting text uses a subset of **Cormorant Garamond** from Google Fonts, under t
 node scripts/prepare-font.mjs public/fonts/cormorant.ttf
 ```
 
-In development only, `window.__pinkBloom.seek(seconds)`, `.play()`, and `.replay()` provide deterministic inspection of each animation stage. These helpers are excluded from production.
+In development only, `window.__pinkBloom.seek(seconds)` and `.play()` provide deterministic inspection of each animation stage. These helpers are excluded from production.

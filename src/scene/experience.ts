@@ -11,7 +11,7 @@ import { createFlower } from './flowers'
 import { createBouquet } from './bouquet'
 import { createParticles } from './particles'
 
-export interface ExperienceUI { progress: HTMLElement; caption: HTMLElement; meaning: HTMLElement; count: HTMLElement; replay: HTMLButtonElement; finalCaption?: string; onReady: () => void; onError: (error: unknown) => void }
+export interface ExperienceUI { progress: HTMLElement; caption: HTMLElement; meaning: HTMLElement; count: HTMLElement; finalCaption?: string; onReady: () => void; onError: (error: unknown) => void }
 export async function createExperience(container: HTMLElement, ui: ExperienceUI) {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const compact = () => window.innerWidth < 640
@@ -97,7 +97,6 @@ export async function createExperience(container: HTMLElement, ui: ExperienceUI)
   timeline.to(stage,{greeting:1,duration:2,ease:'power2.out'},TIMING.greeting)
   timeline.to(particles.uniforms.uBurst,{value:2,duration:0.7,yoyo:true,repeat:1},TIMING.greeting+0.4)
   let currentLabel = ''
-  let finished = false
   function updateUI() {
     const t = timeline.time(), index=Math.min(4,Math.max(0,Math.floor((t-TIMING.countdown)/TIMING.flower)))
     const label=t<TIMING.countdown?'countdown':t<TIMING.wrap?FLOWERS[index].kind:t<TIMING.greeting?'wrapping':'final'
@@ -109,8 +108,6 @@ export async function createExperience(container: HTMLElement, ui: ExperienceUI)
       document.body.dataset.phase=label
     }
     ui.progress.style.transform=`scaleX(${t/TIMING.end})`
-    const isFinished=t>=TIMING.end-0.05
-    if(isFinished!==finished){finished=isFinished;ui.replay.hidden=!finished}
   }
   timeline.eventCallback('onUpdate',updateUI)
   let time=0,last=performance.now(),frame=0,disposed=false,pausedByVisibility=false
@@ -172,8 +169,6 @@ export async function createExperience(container: HTMLElement, ui: ExperienceUI)
     if(time>3&&qualitySamples<90){qualityTotal+=dt;qualitySamples++;if(qualitySamples===90&&qualityTotal/90>0.032){lowQuality=true;renderer.shadowMap.autoUpdate=false;resize()}}
     frame=requestAnimationFrame(render)
   }
-  const replay=()=>{currentLabel='';timeline.restart();if(reduced)timeline.seek(TIMING.end).pause();updateUI()}
-  ui.replay.addEventListener('click',replay)
   const visibility=()=>{
     if(document.hidden){pausedByVisibility=!timeline.paused();timeline.pause();cancelAnimationFrame(frame)}
     else{last=performance.now();if(pausedByVisibility)timeline.resume();frame=requestAnimationFrame(render)}
@@ -190,13 +185,13 @@ export async function createExperience(container: HTMLElement, ui: ExperienceUI)
   const dispose=()=>{
     disposed=true;cancelAnimationFrame(frame);timeline.kill();gsap.killTweensOf(container)
     renderer.domElement.removeEventListener('webglcontextlost',contextLost)
-    window.removeEventListener('resize',resize);window.removeEventListener('pointermove',onPointer);document.removeEventListener('visibilitychange',visibility);ui.replay.removeEventListener('click',replay)
+    window.removeEventListener('resize',resize);window.removeEventListener('pointermove',onPointer);document.removeEventListener('visibilitychange',visibility)
     const geometries=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>()
     scene.traverse(object=>{if(object instanceof THREE.Mesh||object instanceof THREE.Points){geometries.add(object.geometry);if(object instanceof THREE.InstancedMesh)object.dispose();const m=object.material;(Array.isArray(m)?m:[m]).forEach(item=>materials.add(item))}})
     geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());composer.dispose();renderer.dispose();renderer.domElement.remove()
   }
   if(import.meta.env.DEV) {
-    Object.assign(window,{__pinkBloom:{seek:(seconds:number)=>{timeline.seek(seconds).pause();updateUI()},play:()=>timeline.play(),replay,time:()=>timeline.time(),reduced,renderer,scene,flowers,stage,dispose}})
+    Object.assign(window,{__pinkBloom:{seek:(seconds:number)=>{timeline.seek(seconds).pause();updateUI()},play:()=>timeline.play(),time:()=>timeline.time(),reduced,renderer,scene,flowers,stage,dispose}})
   }
   return dispose
 }

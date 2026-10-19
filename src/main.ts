@@ -15,7 +15,6 @@ app.innerHTML = `
     <div id="loading" class="loading" role="status"><div class="loading-flower"><span></span><span></span><span></span><span></span><span></span></div><p>Đang ươm một điều xinh đẹp…</p></div>
     <div class="caption" aria-live="polite" aria-atomic="true"><p id="meaning" class="meaning">ĐỢI MỘT CHÚT NHÉ</p><p id="caption" class="caption-title">Một món quà đang hé nở</p></div>
     <div class="sequence-details" aria-hidden="true"><span id="count">MỘT BẤT NGỜ NHO NHỎ</span><div class="progress-track"><div id="progress"></div></div><span class="signature"><span id="signature">gửi bạn, bằng cả trái tim</span> <span aria-hidden="true">♡</span></span></div>
-    <button id="replay" class="replay" hidden><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1.5 7M4 4v6h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Xem lại</button>
     <h1 id="accessible-greeting" class="sr-only">${GREETING}</h1>
     <section id="fallback" class="fallback" hidden><span class="fallback-flower" aria-hidden="true">✿</span><p id="fallback-dedication" class="meaning">DÀNH RIÊNG CHO BẠN</p><h2>Chúc mừng<br>ngày phụ nữ Việt Nam<br><span>20/10</span></h2><p><span id="fallback-wish">Chúc bạn luôn rạng rỡ, hạnh phúc</span><br>và được yêu thương mỗi ngày.</p><p class="fallback-note">Trình duyệt này chưa thể mở món quà 3D.<br>Hãy thử một trình duyệt hỗ trợ WebGL.</p></section>
   </main>`
@@ -36,7 +35,7 @@ function fallback(error:unknown) {
   dispose?.()
 }
 createExperience(get('scene'),{
-  progress:get('progress'),caption:get('caption'),meaning:get('meaning'),count:get('count'),replay:get<HTMLButtonElement>('replay'),
+  progress:get('progress'),caption:get('caption'),meaning:get('meaning'),count:get('count'),
   finalCaption:copy.finalCaption,
   onReady:()=>{get('loading').hidden=true;document.body.classList.add('ready')},onError:fallback,
 }).then(cleanup=>{if(cancelled)cleanup();else dispose=cleanup}).catch(fallback)
