@@ -3,6 +3,7 @@ import { FLOWERS, type FlowerKind } from '../config'
 import { addBouquetInteriorMorph, petalGeometry } from './geometry'
 import { petalMaterial, stemMaterial, leafMaterial, goldMaterial } from './materials'
 import { createRose } from './rose'
+import { createPeony } from './peony'
 
 export interface Flower { group: THREE.Group; head: THREE.Group; state: { scale: number; bloom: number; travel: number; turn: number }; update: (time: number) => void }
 const sphere = new THREE.SphereGeometry(1, 10, 8)
@@ -20,20 +21,26 @@ export function createFlower(index: number): Flower {
   flowerToBouquet.setPosition(...config.position)
   const { material, uniforms } = petalMaterial(config.color, config.accent)
   const rose = kind === 'rose' ? createRose(material) : null
+  const peony = kind === 'peony' ? createPeony(material) : null
   if (rose) {
     material.roughness = 0.72; material.metalness = 0; material.sheen = 0.5; material.clearcoat = 0.03
     head.add(rose.group)
   }
+  if (peony) {
+    head.rotation.x = 1.0
+    material.roughness = 0.78; material.metalness = 0; material.sheen = 0.65; material.clearcoat = 0
+    uniforms.tip.value.lerp(new THREE.Color(config.color), 0.25)
+    head.add(peony.group)
+  }
   const petals: { mesh: THREE.InstancedMesh; layerIndex: number; count: number; radius: number; open: number }[] = []
   const dummy = new THREE.Object3D()
-  const layers: Record<Exclude<FlowerKind, 'rose'>, { count: number; length: number; width: number; angle: number; radius: number; cup: number; curl: number }[]> = {
-    peony: Array.from({ length: 5 }, (_, i) => ({ count: 9 + i * 3, length: 0.43 + i * 0.13, width: 0.21 + i * 0.04, angle: 0.35 + i * 0.24, radius: 0.035 + i * 0.035, cup: 0.18, curl: -0.12 })),
+  const layers: Record<Exclude<FlowerKind, 'rose' | 'peony'>, { count: number; length: number; width: number; angle: number; radius: number; cup: number; curl: number }[]> = {
     tulip: [{ count: 3, length: 1.1, width: 0.4, angle: 0.28, radius: 0.10, cup: 0.3, curl: -0.04 }, { count: 3, length: 1.04, width: 0.43, angle: 0.51, radius: 0.12, cup: 0.25, curl: -0.08 }],
     daisy: [{ count: 18, length: 0.78, width: 0.12, angle: 1.43, radius: 0.12, cup: 0.07, curl: 0.10 }, { count: 16, length: 0.68, width: 0.115, angle: 1.25, radius: 0.1, cup: 0.06, curl: 0.04 }],
     lily: [{ count: 3, length: 1.12, width: 0.29, angle: 1.14, radius: 0.03, cup: 0.25, curl: -0.55 }, { count: 3, length: 1.02, width: 0.30, angle: 0.93, radius: 0.04, cup: 0.22, curl: -0.45 }],
   }
-  if (kind !== 'rose') layers[kind].forEach((layer, layerIndex) => {
-    const geometry = petalGeometry({ ...layer, pointed: kind === 'lily' ? 1.2 : kind === 'daisy' ? 0.55 : 0.58, ruffle: kind === 'peony' ? 0.055 : 0 })
+  if (kind !== 'rose' && kind !== 'peony') layers[kind].forEach((layer, layerIndex) => {
+    const geometry = petalGeometry({ ...layer, pointed: kind === 'lily' ? 1.2 : kind === 'daisy' ? 0.55 : 0.58 })
     const mesh = new THREE.InstancedMesh(geometry, material, layer.count)
     mesh.castShadow = true; mesh.receiveShadow = true; mesh.frustumCulled = false
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
@@ -71,9 +78,10 @@ export function createFlower(index: number): Flower {
   return {
     group, head, state,
     update(time) {
-      // The rose uses shell morphs, including matching normals, for its bloom.
-      uniforms.bloom.value = rose ? 1 : state.bloom; uniforms.time.value = time
+      // Shell flowers animate positions and normals together via morph targets.
+      uniforms.bloom.value = rose || peony ? 1 : state.bloom; uniforms.time.value = time
       rose?.update(state.bloom)
+      peony?.update(state.bloom)
       stemAndLeaves.forEach(mesh => { mesh.morphTargetInfluences![0] = state.travel })
       petals.forEach(({ mesh, layerIndex, count, radius, open }) => {
         for (let j = 0; j < count; j++) {

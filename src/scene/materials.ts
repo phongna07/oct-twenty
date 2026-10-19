@@ -8,13 +8,15 @@ export function petalMaterial(color: string, accent: string) {
     shader.uniforms.uPetalTime = uniforms.time
     shader.uniforms.uTipColor = uniforms.tip
     shader.vertexShader = 'uniform float uBloom; uniform float uPetalTime; varying vec2 vPetalUv;\n' + shader.vertexShader
-    shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', `
-      #include <begin_vertex>
+    shader.vertexShader = shader.vertexShader.replace('#include <morphtarget_vertex>', `
+      #include <morphtarget_vertex>
       vPetalUv = uv;
       float fold = (1.0 - uBloom) * 1.15;
       float a = fold * uv.y;
-      transformed.y = position.y * cos(a) - position.z * sin(a);
-      transformed.z = position.y * sin(a) + position.z * cos(a);
+      // Preserve the shell flowers' morph targets before applying the fold.
+      vec3 petalPosition = transformed;
+      transformed.y = petalPosition.y * cos(a) - petalPosition.z * sin(a);
+      transformed.z = petalPosition.y * sin(a) + petalPosition.z * cos(a);
       transformed.z += sin(uPetalTime * 1.2 + uv.y * 4.0) * 0.012 * uv.y * uBloom;
     `)
     shader.fragmentShader = 'uniform vec3 uTipColor; varying vec2 vPetalUv;\n' + shader.fragmentShader
