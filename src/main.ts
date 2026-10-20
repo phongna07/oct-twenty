@@ -10,7 +10,7 @@ app.innerHTML = `
     <div class="ambient ambient-left" aria-hidden="true"></div>
     <div class="ambient ambient-right" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
-    <div class="dedication" aria-hidden="true"><span class="tiny-flower">✳</span><span>20.10</span><i></i><span id="dedication" class="dedication-text">DÀNH RIÊNG CHO BẠN</span></div>
+    <div class="dedication" aria-hidden="true"><svg class="tiny-flower" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v18M3 12h18M5.64 5.64l12.72 12.72M5.64 18.36L18.36 5.64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg><span>20.10</span><i></i><span id="dedication" class="dedication-text">DÀNH RIÊNG CHO BẠN</span></div>
     <div id="scene" aria-hidden="true"></div>
     <div id="loading" class="loading" role="status"><div class="loading-flower"><span></span><span></span><span></span><span></span><span></span></div><p>Đang ươm một điều xinh đẹp…</p></div>
     <div class="caption" aria-live="polite" aria-atomic="true"><p id="meaning" class="meaning">ĐỢI MỘT CHÚT NHÉ</p><p id="caption" class="caption-title">Một món quà đang hé nở</p></div>
